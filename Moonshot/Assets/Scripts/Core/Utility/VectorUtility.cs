@@ -205,7 +205,7 @@ namespace Core.Utility {
         }
 
         public static Vector2 Rotate(this Vector2 v, float angle) {
-            var rads = angle * DegreesToRadians;
+            var rads = -angle * DegreesToRadians;
             var tx = v.x;
             var cosRads = (float)Math.Cos(rads);
             var sinRads = (float)Math.Sin(rads);
@@ -216,7 +216,7 @@ namespace Core.Utility {
         }
 
         public static Vector3 RotateXZPlanar(this Vector3 v, float angle) {
-            var rads = angle * DegreesToRadians;
+            var rads = -angle * DegreesToRadians;
             var tx = v.x;
             var cosRads = (float)Math.Cos(rads);
             var sinRads = (float)Math.Sin(rads);
