@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Assets.Scripts.Game.Common;
+﻿using Assets.Scripts.Game.Common;
 using Assets.Scripts.Game.Data;
 using Core.Utility;
 using UnityEditor;
@@ -18,19 +13,29 @@ namespace Assets.Scripts.Game.Managers {
         private static readonly Color WindCompassLineColor = new Color(1f, 0.15f, 0.15f, 1f);
 
         public EnvironmentSetting Settings;
+        public WindManager WindManager;
+
+        public void Start() {
+            // Apply settings to fixed environment effectors
+
+            // Wind
+            this.WindManager.Settings = this.Settings.Wind;
+        }
 
 #if UNITY_EDITOR_WIN
         public void OnDrawGizmos() {
             DrawBase();
 
-            // Draw the atmospheric layer viz
-            DrawAtmosphere();
+            if (this.Settings != null) {
+                // Draw the atmospheric layer viz
+                DrawAtmosphere();
 
-            // Draw our compass
-            DrawCompass();
+                // Draw our compass
+                DrawCompass();
 
-            // Wind Data
-            DrawWind();
+                // Wind Data
+                DrawWind();
+            }
         }
 
         private void DrawBase() {
@@ -40,6 +45,10 @@ namespace Assets.Scripts.Game.Managers {
         }
 
         private void DrawAtmosphere() {
+            if (this.Settings.AtmosphericLayers == null) {
+                return;
+            }
+
             var startPt = this.transform.position;
 
             Gizmos.color = AtmosphereLineColor;
@@ -74,34 +83,9 @@ namespace Assets.Scripts.Game.Managers {
         }
 
         private void DrawWind() {
-            float WindDirToAngle(CompassDirection cdir) {
-                switch (cdir) {
-                    case CompassDirection.N:
-                        return 0f;
-                    case CompassDirection.E:
-                        return 90f;
-                    case CompassDirection.W:
-                        return 270f;
-                    case CompassDirection.S:
-                        return 180f;
-
-                    case CompassDirection.NE:
-                        return 45f;
-                    case CompassDirection.NW:
-                        return 315f;
-                    case CompassDirection.SE:
-                        return 125f;
-                    case CompassDirection.SW:
-                        return 225f;
-
-                    default:
-                        return 0f;
-                }
-            }
-
-            var angle = WindDirToAngle(this.Settings.WindDirection);
+            var angle = CompassUtility.WindDirToAngle(this.Settings.Wind.Direction);
             var startPt = this.transform.position + new Vector3(0, 15f, 0);
-            DrawArrow(WindCompassLineColor, startPt, angle, 10f, $"Wind: {this.Settings.WindDirection} / Speed: {this.Settings.WindSpeed}");
+            DrawArrow(WindCompassLineColor, startPt, angle, 10f, $"Wind: {this.Settings.Wind.Direction} / Speed: {this.Settings.Wind.WindSpeed}");
         }
 
         private void DrawArrow(Color color, Vector3 basePosition, float rotDegs, float length, string label = "") {
@@ -119,6 +103,6 @@ namespace Assets.Scripts.Game.Managers {
             Gizmos.DrawLine(mainLineEndPt, rightLeg);
             Handles.Label(labelStartPt, label);
         }
-#endif
+#endif  
     }
 }

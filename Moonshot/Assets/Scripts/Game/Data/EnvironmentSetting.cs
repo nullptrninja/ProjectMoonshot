@@ -6,7 +6,7 @@ namespace Assets.Scripts.Game.Data {
     public class EnvironmentSetting : ScriptableObject {
         public AtmosphereDescriptor[] AtmosphericLayers;
         public float Gravity;
-        public CompassDirection WindDirection;
-        public float WindSpeed;
+        public WindSettings Wind;
+
     }
 }
