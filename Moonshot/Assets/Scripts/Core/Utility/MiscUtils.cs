@@ -15,6 +15,10 @@ namespace Core.Utility {
             return v >= 0f ? 1f : -1f;
         }
 
+        public static float RandomSign() {
+            return UnityEngine.Random.Range(0, 100) > 50 ? 1f : -1f;
+        }
+
         public static float Clamp(float actualValue, float min, float max) {
             if (actualValue < min) {
                 return min;

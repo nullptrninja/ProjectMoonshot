@@ -12,10 +12,12 @@ namespace Assets.Scripts.Game.Environment {
         public Rigidbody TargetBody;
         public float EmitterSocialDistance = 15f;        
         public float ImpulseDurationSeconds;
+        public float WindVectorRandomRadius = 15f;
         public LayerMask LayerMask;
 
         private Vector3 mWindVector;
         private float mHitTestDistance;
+        private float mElapsedTime;
         private TrigWaveGenerator mWindModel;
 
         public void Start() {
@@ -24,6 +26,7 @@ namespace Assets.Scripts.Game.Environment {
             mWindModel.Start(TrigWaveGenerator.WaveType.Sine, this.ImpulseDurationSeconds, 0f, 180f);
 
             SocialDistanceFromTarget();
+            mWindVector = GetWindVector();
         }
 
         public void Update() {
@@ -34,9 +37,14 @@ namespace Assets.Scripts.Game.Environment {
             if (this.TargetBody != null) {
                 SocialDistanceFromTarget();
 
-                // Apply wind from ray cast.
-                // Note: this current emits the ray from the center of the emiiter
-                mWindVector = GetWindVector();
+                mElapsedTime += Time.deltaTime;
+                if (mElapsedTime >= this.ImpulseDurationSeconds) {
+                    mWindVector = GetWindVector();
+                    mElapsedTime = 0f;
+                    //Debug.Log($"Switched wind dir to: {mWindVector}");
+                }
+    
+                // Apply wind from ray cast.                
                 if (TestWindRayIntersect(mWindVector, out var hit)) {
                     var scaledWindVect = mWindVector * mWindModel.CurrentValue;
                     this.TargetBody.AddForceAtPosition(scaledWindVect, hit.point);
@@ -56,7 +64,8 @@ namespace Assets.Scripts.Game.Environment {
         }
 
         private Vector3 GetWindVector() {
-            var windUnitVect = VectorUtility.GetPointingVector3(this.transform, this.TargetBody.transform) * this.WindSpeedImpulse;
+            var xyRandomRot = Random.Range(0f, this.WindVectorRandomRadius) * MiscUtils.RandomSign();
+            var windUnitVect = VectorUtility.GetPointingVector3(this.transform, this.TargetBody.transform).RotateXZPlanar(xyRandomRot) * this.WindSpeedImpulse;
             return windUnitVect;
         }
 
@@ -66,7 +75,7 @@ namespace Assets.Scripts.Game.Environment {
             Gizmos.DrawWireSphere(this.transform.position, 1f);
 
             Gizmos.color = WindForceVectorColor;
-            var windRay = GetWindVector();
+            var windRay = mWindVector;
             Gizmos.DrawRay(this.transform.position, windRay);
         }
 #endif
