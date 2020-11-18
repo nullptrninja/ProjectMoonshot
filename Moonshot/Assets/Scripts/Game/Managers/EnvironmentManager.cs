@@ -1,11 +1,11 @@
 ﻿using Assets.Scripts.Game.Common;
 using Assets.Scripts.Game.Data;
+using Assets.Scripts.Game.Environment;
 using Core.Utility;
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Scripts.Game.Managers {
-    [ExecuteInEditMode]
+namespace Assets.Scripts.Game.Managers {    
     public class EnvironmentManager : MonoBehaviour {
         private static readonly Color BaseColor = new Color(0.5f, 0.5f, 1f, 1f);
         private static readonly Color AtmosphereLineColor = new Color(0.25f, 1f, 0.25f, 1f);
@@ -18,8 +18,41 @@ namespace Assets.Scripts.Game.Managers {
         public void Start() {
             // Apply settings to fixed environment effectors
 
+            // Gravity. We only support vertical gravity changes.
+            Physics.gravity = new Vector3(0f, this.Settings.Gravity, 0f);
+
             // Wind
             this.WindManager.Settings = this.Settings.Wind;
+
+            // Create atmosphere bounds
+            CreateAtmosphere();
+        }
+
+        private void CreateAtmosphere() {
+            var i = 0;
+            var lastAtmHeight = 0f;
+            foreach (var atm in this.Settings.AtmosphericLayers) {
+                CreateAtmosphereBounds(atm, lastAtmHeight, i++);
+                lastAtmHeight += atm.Height;
+            }
+        }
+
+        private void CreateAtmosphereBounds(AtmosphereDescriptor atm, float prevAtmHeight, int ordinalForNamingPurposes) {
+            var atmNode = new GameObject($"Atmosphere_{ordinalForNamingPurposes}");
+            atmNode.transform.SetParent(this.transform);
+            atmNode.transform.localPosition = new Vector3(this.Settings.AreaSize.x / 2f,
+                                                          0f + prevAtmHeight,
+                                                          -this.Settings.AreaSize.y / 2f);
+
+            var box = atmNode.AddComponent<BoxCollider>();
+            box.center = new Vector3(0f, atm.Height / 2f, 0f);
+            box.size = new Vector3(this.Settings.AreaSize.x,
+                                   atm.Height,
+                                   this.Settings.AreaSize.y);
+            box.isTrigger = true;
+
+            var atmVol = atmNode.AddComponent<AtmosphericHandler>();
+            atmVol.AtmosphereSetting = atm;
         }
 
 #if UNITY_EDITOR_WIN

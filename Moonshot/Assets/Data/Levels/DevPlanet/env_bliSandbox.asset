@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14d29ae3e4bdbd945874bf751a34d8b4, type: 3}
   m_Name: env_bliSandbox
   m_EditorClassIdentifier: 
+  AreaSize: {x: 80, y: 80}
   AtmosphericLayers:
   - Height: 50
-    Drag: 10
+    Drag: 0.3
   - Height: 20
-    Drag: 5
+    Drag: 0.2
   - Height: 20
-    Drag: 5
+    Drag: 0.1
   Gravity: -9.81
   Wind:
     Direction: 4

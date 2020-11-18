@@ -20,9 +20,12 @@ namespace Assets.Scripts.Game.Environment {
         private float mElapsedTime;
         private TrigWaveGenerator mWindModel;
 
-        public void Start() {
-            mHitTestDistance = this.EmitterSocialDistance * 2f;
+        public void Awake() {
             mWindModel = new TrigWaveGenerator(Core.Common.TimeScale.Scaled, true);
+        }
+
+        public void Start() {
+            mHitTestDistance = this.EmitterSocialDistance * 2f;            
             mWindModel.Start(TrigWaveGenerator.WaveType.Sine, this.ImpulseDurationSeconds, 0f, 180f);
 
             SocialDistanceFromTarget();
