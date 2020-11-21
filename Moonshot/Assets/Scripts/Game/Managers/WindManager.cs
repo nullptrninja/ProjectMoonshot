@@ -10,7 +10,11 @@ namespace Assets.Scripts.Game.Managers {
 
         public void OnTriggerEnter(Collider other) {
             var body = other.attachedRigidbody;
-            CreateWindEmitter(body);
+            var desc = other.gameObject.GetComponent<EnvironmentalObjectDescriptor>();
+
+            if (desc != null && desc.AffectedByWind) {
+                CreateWindEmitter(body);
+            }
         }
 
         public void OnTriggerExit(Collider other) {
